@@ -4,7 +4,7 @@
 
 ```java
 static String firstLineOfFile(String path) throws IOException {
-    BufferedReader br = new BufferedReader(new FileReader(peth));
+    BufferedReader br = new BufferedReader(new FileReader(path));
     try {
         return br.readLine();
     } finally{
@@ -35,9 +35,9 @@ static void copy(String scr, String dst) throws IOException {
 
 
 ### 2. try-with-resources를 적용해보자.
-- java7 부터 명시적으로 close를 호출하지 않아도 AuthCloseable이 자동으로 호출해줍니다.
+- java7 부터 명시적으로 close를 호출하지 않아도 AutoCloseable이 자동으로 호출해줍니다.
 - 자원을 쉽게 해제할 수 있고, 코드를 간결하게 유지할 수 있습니다.
-- AuthCloseable 인터페이스를 구현하면 try 구문이 종료될 때 객체의 close 메소드를 호출해서 자원을 닫아줍니다.
+- AutoCloseable 인터페이스를 구현하면 try 구문이 종료될 때 객체의 close 메소드를 호출해서 자원을 닫아줍니다.
 - InputStream 객체가 Closeable 을 구현하므로 FileInputStream 객체가 해제될 수 있습니다.
 ```java
 public abstract class InputStream extends Object implements Closeable {
