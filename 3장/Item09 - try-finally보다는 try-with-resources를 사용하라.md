@@ -18,7 +18,7 @@ static String firstLineOfFile(String path) throws IOException {
 static void copy(String scr, String dst) throws IOException {
     InputStream in = new FileInputStream(src);
     try {
-        OutputStream out = new FileInputStream(dst);
+        OutputStream out = new FileOutputStream(dst);
         try{
             byte[] buf = new byte[BUFFER_SIZE];
             int n;
