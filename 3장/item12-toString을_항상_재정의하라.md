@@ -4,7 +4,7 @@ Object의 기본 toString 메소드가 우리가 작성한 클래스에 적절�
 
 ## 1️⃣. toString을 재정의 하지 않은 예시와 한 예시
 
-![img.png](img.png)
+![img.png](image/img.png)
 
 ## 2️⃣. toString을 어떻게 재정의하는 것이 좋을까?
 
