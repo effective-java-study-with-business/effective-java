@@ -79,7 +79,7 @@ public class Member {
 - 필드가 참조하는 가변 객체를 클라이언트에서 직접 접근하여 수정하는 일을 막는다.
 - **public final로만 처리해도 되지만, 그 안의 내용을 바꿀 수 있고 다음 릴리즈에서 내부 표현을 변경하지 못하므로 사용하지 않는게 좋다.**
 
-![img.png](image/img.png)![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/3a98c7f0-3046-4ffe-9eb8-cfe655e30034/Untitled.png)
+![img.png](image/img.png)
 
 ### E) 자신(객체) 이외에는 내부의 가변 컴포넌트에 접근할 수 없도록 한다.
 
