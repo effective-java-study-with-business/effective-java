@@ -27,8 +27,86 @@
 
 ## 3. 상속용 클래스를 만들 때의 주의 사항
 1. 상속용 클래스의 생성자는 어떤 식으로든 재정의가 가능한 메소드를 호출하면 안됨
-    - 상위 클래스의 생성자가 
-3. ㅇ
-4. 
+    - 상위 클래스의 생성자가 먼저 실행 : 하위 클래스에서 재정의한 메소드가 하위 클래스의 생성자보다 먼저 호출된다.
+    ```java
+    //잘못된 예시
+    public class ExceptionHandler {
+        // This constructor should be executed at first
+        public ExceptionHandler() {
+
+            // printLog() is run before executing RuntimeExceptionHandler(Sub's) constructor
+            printLog();
+        }
+
+        // overridable
+        public void printLog() {}
+
+    }
+    ```
+    ```java
+    public final class CustomExceptionHandler extends ExceptionHandler{
+        
+        // Not initialized final field, this will be initialized in constructor
+        private final LocalDateTime occurredTime;
+
+        public CustomExcpeitonHandler() {
+            this.occurredTime = LocalDateTime.now();
+        }
+
+        // Overridable method. Super class constructor call this method.
+        @Override
+        public void printLog() {
+            System.out.println(occurredTime.toString());
+        }
+        
+        public static void main(String[] args) {
+            CustomExceptionHandler h = new CustomExceptionHandler();
+            h.printLog();
+        }
+
+    }
+    ```
+    - 위의 경우는 CustomExceptionHandler에서 occurredDate의 toString 메소드를 부르려고 하면, 상위 클래스의 생성자가 printLog 호출 시 NPE를 호출
+    - CustomExcpetionHandler의 생성자로 객체를 생성해도 상위 클래스인 ExceptionHandler의 생성자를 호출하기 때문에, 이 시점에서 printLog 메소드는 하위 클래스의 생성자 호출이 끝나지 않았기 때문에 occurredTime이 초기화 되지 않은 상태
+    - 이 상태에서 ExceptionHandler의 생성자가 호출하는 printLog가 CustomExceptionHandler의 printLog이기 때문에 occurredTime == null이므로 toString()에서 NPE가 뜨게 된다.
+
+## 4. 해결 방법
+```
+상속용으로 쓰이지 않은 클래스는 상속을 하지 못하도록 지정하는 것이다!
+```
+1. 클래스에 final을 선언하여 상속을 못하도록 한다.
+    ```java
+    public final class NonOverridableClass {
+        // Constructors, fields, methods ...
+    }
+    ```
+2. 모든 생성자를 private, package-private로 선언 후에 public 정적 factory 메소드를 만들어준다.
+    - 이 경우, 내부에서 다양한 하위 클래스를 만들어서 쓸 수 있다.
+    ```java
+    public class OverridableClass {
+        private OverridableClass() {}
+
+        public static OverridableClass of() {
+            return new OverridableClass();
+        }
+    }
+    ```
+
+3. 구체 클래스에서 상속이 필요하다면, override가 가능한 메소드를 호출하는 코드를 제거하고, 이를 문서로 남긴다.
+    - override 가능 메소드는 자신의 코드를 private 선언된 메소드로 옮기고 이 메소드를 호출하도록 수정한다.
+    - overridable method를 호출하는 다른 코드도 위의 private 선언된 메소드를 직접 부르도록 한다.
+    ```java
+    public class OverridableClass {
+        public overridable() {
+            helper();
+        }
+
+        private helper() {
+            // logics...
+        }
+    }
+    ```
+
+4. 가급적이면 interface를 두어 상속하도록 하는 것이 좋다.
 ## References
 [1] https://codedragon.tistory.com/7943
