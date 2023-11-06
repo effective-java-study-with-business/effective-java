@@ -250,7 +250,6 @@ public class Item14_2 {
         System.out.println("Compare Result 4: " + compareResult4);
         
         // Compare Result 4: 0
-        
 ```
 
 ## compareTo 메서드 작성 요령
@@ -271,9 +270,70 @@ public class Item14_2 {
 
 이 책의 2판에서는 compareTo 메서드에서 정수 기본 타입 필드를 비교할 때는 < 와 >를, 실수는 Double.compare, Fload.compare를 사용하라고 권했다. 하지만 자바 7부터는 상황이 변했다. compare가 새롭게 추가 되었다. <와 > 를 사용하는 이전 방식은 거추장스럽고 오류를 유발하니, 이제는 추천하지 않는다.
 
+## java8과 Comparator
+java8에서는 Comparator 인터페이스가 일련의 비교자 생성 메서드와 팀을 꾸려 메서드 연쇄 방식으로 비교자를 생성 할 수 있게 되었습니다.
+
+예시
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        List<Person> people = new ArrayList<>();
+        people.add(new Person("Smith", "Alice", 30));
+        people.add(new Person("Johnson", "Bob", 25));
+        people.add(new Person("Smith", "Charlie", 35));
+        people.add(new Person("Johnson", "Anna", 30));
+
+        // Comparator를 사용하여 성, 이름, 나이 순서로 정렬
+        Comparator<Person> personComparator = new Comparator<Person>() {
+            @Override
+            public int compare(Person person1, Person person2) {
+                int lastNameComparison = person1.get성().compareTo(person2.get성());
+                if (lastNameComparison != 0) {
+                    return lastNameComparison;
+                }
+
+                int firstNameComparison = person1.get이름().compareTo(person2.get이름());
+                if (firstNameComparison != 0) {
+                    return firstNameComparison;
+                }
+
+                return Integer.compare(person1.get나이(), person2.get나이());
+            }
+        };
+
+        Collections.sort(people, personComparator);
+
+        for (Person person : people) {
+            System.out.println(person);
+        }
+    }
+}
+```
+
+비교자 생성 메서드를 이용하면 더 간결하고 깔끔하게 사용할 수 있습니다.
+```java
+        // Comparator를 사용하여 성, 이름, 나이 순서로 정렬
+        Comparator<Person> personComparator = Comparator
+                .comparing(Person::get성)
+                .thenComparing(Person::get이름)
+                .thenComparingInt(Person::get나이);
+```
+
+Comparator 방식은 간결하게 사용할 수 있지만 약간에 속도저하가 발생한다.
+
+
+### Comparator는 왜 속도 저하가 발생하는가?
+
+1. 내부 비교 로직의 효율성: Comparable은 객체 자체의 클래스 내에 비교 로직을 가지고 있기 때문에 객체의 비교에 대한 최적화가 더 쉽게 이루어질 수 있습니다. 이는 JVM이 객체 비교를 최적화하기 위해 더 좋은 기회를 가지게 하며, 불필요한 비교 작업을 줄일 수 있습니다. 반면에 Comparator를 사용하는 경우 비교 로직이 외부에 있기 때문에 JVM이 최적화하기가 더 어려울 수 있습니다.
+
+2. Comparator 객체 생성 비용: Comparator를 사용하는 경우마다 비교를 수행하는 Comparator 객체를 생성해야 합니다. 이 객체 생성 비용은 Comparable을 사용할 때보다 더 많은 오버헤드를 유발할 수 있습니다. 또한 Comparator 객체의 재사용을 고려하지 않으면 비교 작업마다 객체를 계속 생성해야 하므로 성능 저하가 발생할 수 있습니다.
+
+
 ## 요약
 
-- 순서를 고려해야하는 값 클래스를 작성하게 된다면 꼭 Comparable 인터페이스를 구현하여
-- 인스턴스들을 쉽게 정렬/검색하고 비교 기능을 제공하는 컬렉션과 어우러져야 한다.
+- 순서를 고려해야하는 값 클래스를 작성하게 된다면 꼭 Comparable 인터페이스를 구현하여  인스턴스들을 쉽게 정렬/검색하고 비교 기능을 제공하는 컬렉션과 어우러져야 한다.
 - compareTo()에서는 필드 값 비교시에 <,>를 사용하지 말고 박싱된 기본 타입 클래스가 제공하는 정적 메서드인 compare()이나 Comparator 인터페이스가 제공하는 비교자 생성 메서드를 사용하도록 한다.
 
+### 함꼐 보면 좋은 자료
+[자바 [JAVA] - Comparable 과 Comparator의 이해](https://st-lab.tistory.com/243)
