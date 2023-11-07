@@ -62,7 +62,7 @@ public class Client {
     }
 }
 ```
-추상클래스 또는 인터페이스를 private 필드로 두고 나머지 인터페이스의 메서드를 구현해 
+추상클래스 또는 인터페이스를 private 필드로 두고 나머지 인터페이스의 메서드를 구현해 </br>
 동일한 상위 클래스만을 통하는 일관된 방식을 만들 수 있습니다.
 
 ## 3. 언제 상속과 컴포지션을 사용할까?
@@ -149,6 +149,24 @@ public class ForwardingSet<E> implements Set<E> {
 Set<E> set = new InstrumentedSet<>(new HashSet<>(INIT_CAPACITY));
 ```
 위의 구조로 Set 구현체라면 InstrumentedSet을 이용해 모두 계측이 가능합니다.
+
+### 상속과 컴포지션 구조 비교 예시
+HashSet을 직접 상속한 InstrumentedHashSet 클래스와 </br>
+컴포지션 패턴으로 TreeSet을 사용한 InstrumentedSet 클래스를 비교해보겠습니다.
+
+<img width="808" alt="image" src="https://github.com/effective-java-study-with-business/effective-java/assets/45473375/82fe855b-8b5f-415a-9478-b3a811fb71f2">
+
+HashSet을 직접 상속한 InstrumentedHashSet의 경우 </br>
+addAll() 호출시 직접 구현한 add() 메서드를 사용하기 때문에 중복 카운팅이 올라갑니다.
+
+<img width="459" alt="image" src="https://github.com/effective-java-study-with-business/effective-java/assets/45473375/662a077b-a49c-49f1-bca2-7e31d70be8b5">
+
+하지만 컴포지션 방식의 구조를 사용한 InstrumentedSet 클래스의 경우 </br>
+addAll() 호출하더라도, ForwardingSet 에 있는 TreeSet의 add() 메서드를 사용하게 되므로 카운팅이 올라가지 않습니다.
+
+<img width="621" alt="image" src="https://github.com/effective-java-study-with-business/effective-java/assets/45473375/c0baa402-844d-46c1-b0bb-fa67a9a28a68">
+
+따라서 새로운 클래스는 기존클래스의 내부 구현 방식이 바뀌어도 영향을 받지 않게 됩니다.
 
 ## 5. 요약
 - 상속은 강력하게 결합하여 캡슐화를 해침니다.
