@@ -14,7 +14,7 @@ public interface JwtConstant {
 }
 ```
 
-![img.png](image/img02.png)![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/a7812e84-4697-40a0-8127-3e3229a9a64b/a7b802f9-3592-4e6a-ba47-90bc8f654e46/Untitled.png)
+[Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/a7812e84-4697-40a0-8127-3e3229a9a64b/a7b802f9-3592-4e6a-ba47-90bc8f654e46/Untitled.png)
 
 - 실제로 회사에서 온보딩 하면서 받은 리뷰입니다… (부끄)
 
