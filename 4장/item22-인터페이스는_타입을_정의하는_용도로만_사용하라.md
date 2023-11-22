@@ -74,7 +74,7 @@ public class GeometryCalculator implements CalculatorConstants {
 
 ## 3️⃣. 그러면 어떻게 써야 적절할까요?
 
-### A) 클래스나 인터페이스 자체에 추가를 한다.
+### A) 클래스 자체에 추가를 한다.
 
 ```java
 public final class Integer extends Number
