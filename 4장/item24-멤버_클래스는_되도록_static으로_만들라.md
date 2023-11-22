@@ -4,7 +4,7 @@
 다른 클래스 안에 정의된 클래스
 중첩 클래스는 반드시 중첩 클래스를 감싼 바깥의 클래스에서 쓰여야 한다
 ```
-### 종류
+### Nested Class 종류
 1. static member class
 2. member class(non-static)
 3. anonymous class
@@ -65,9 +65,7 @@
    - 이미 멤버 클래스가 생성자를 통해 인스턴스로 만들어졌으므로 변경할 수 없음
 3. 비정적 멤버 클래스는 어댑터<sup>[4]</sup>를 정의할 때 사용됨
    - 어댑터 패턴? 호환되지 않는 인터페이스들을 연결하여 사용할 수 있게 하는 패턴
-   ```java
-
-   ```
+   - 예시) Map의 keySet() 반환 시에 Map으로부터 key의 Set을 가져오기 위한 코드<sup>[4]</sup>
 
 ## 4. Anonymous Class
 1. 이름도 없고 바깥 클래스의 멤버라고 할 수 없음
@@ -81,26 +79,25 @@
 7. 여러 인터페이스 구현 및 인터페이스 구현+상속하여 사용 불가
 8. 익명 클래스를 사용하는 클라이언트는 익명 클래스가 상위 클래스로부터 상속한 멤버만 사용 가능
    ```java
-   class Article {
-        public publish() {
+   public class Article {
+        public String publish() {
             return "Publishing done.";
         }
    }
-   class Main {
+   ```
+   ```java
+   public class ArticleMain {
         public static void main(String[] args){
             // Anonymous class
             Article draft = new Article() {
                 @Override
-                public publish() {
+                public String publish() {
                     return "Draft is temporary saved.";
                 }
             };
             System.out.println(draft.publish());
         }
    }
-   ```
-   ```java
-   
    ```
 
 ## 5. Local Class
