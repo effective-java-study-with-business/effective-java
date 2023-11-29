@@ -6,6 +6,15 @@
 - 비겸사 경고는 `-Xlint:unchecked` 옵션을 추가해 컴파일시 컴파일러가 알려주는데, IDE 상에서 친절하게 미리 경고해주므로, 발견시 맞춰 수정해주면 됩니다.
 - Raw 타입 사용하지 말고, 다이아몬드 연산자 `<>`를 붙여주어 타입을 추론하게 하여 경고를 없앱니다.
 - 가능한 모든 비검사 경고를 무시하지 말고 수정해줍니다.
+- 프로젝트 내 build.gradle 설정에 다음을 추가하면 경고 문구를 볼 수 있습니다.
+```java
+  tasks.withType(JavaCompile) {
+  options.compilerArgs << "-Xlint:unchecked"
+  }
+ ```
+
+<img width="1100" alt="image" src="https://github.com/effective-java-study-with-business/effective-java/assets/45473375/1537225c-2632-44fa-bf64-48dfc3c11c96">
+
 
 ## 2. 타입 안전하다고 확신할 수 있고, 경고를 무시할 수 있는 경우
 - @SuppressWarnings("unchecked") 애너테이션을 달아서 경고를 숨길수 있습니다. 
