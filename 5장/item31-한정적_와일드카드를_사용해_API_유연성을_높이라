@@ -31,7 +31,7 @@ public static void main(String[] args) {
 -> java: incompatible types: java.lang.Iterable<java.lang.Integer> cannot be converted to java.lang.Iterable<java.lang.Number>
 정확한 타입 E의 요소를 받지 못했기 때문이다.
 
-##popAll() - 소비자(Consumer)
+## popAll() - 소비자(Consumer)
 와일드카드 타입을 사용하지 않은 popAll 메서드 -> 결합이 있다.
 
 ```java
@@ -79,7 +79,7 @@ public void popAll(Collection<? super E> dst) {
 pushAll()은 스택이 사용할 인스턴스를 생산하므로 extends
 popAll()은 스택의 인스턴스를 소비하므로 super
 
-###example1
+### example1
 다음 union 메서드는 어떻게 선언해야할까?
 ```java
 public static <E> Set<E> union(Set<E> s1, Set<E> s2)
@@ -99,7 +99,7 @@ public static <E> Set<E> union(Set<? extends E> s1, Set<? extends E> s2)
 ...
 ```
 
-###example2
+### example2
 다음 union 메서드는 어떻게 선언해야할까?
 ```java
 public static <E extends Comparable<E>> E max(List<E> list)
@@ -118,7 +118,7 @@ List<SchduledFuture<?>> scheduledFutures = ...;
 ```
 해당 리스트는 오직 수정된 max로만 처리할 수 있다.
 
-###example3
+### example3
 다음 비한정적 타입 매개변수와 비한정적 와일드카드를 사용한 선언 중 어떤것이 더 나을까? 나은 이유는 무엇인가?
 ```java
 public static <E> void swap(List<E> list, int i, int j);
