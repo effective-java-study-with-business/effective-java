@@ -1,0 +1,99 @@
+# 아이템 43. 람다보다는 메서드 참조를 사용하라
+
+람다보다 간결하게 만드는 '메서드 참조'
+
+## 람다 vs 메서드 참조 - 메서드 참조 win
+
+### 람다
+```java
+map.merge(key, 1, (count, incr) -> count + incr);
+```
+merge 메서드는 키, 값, 함수를 인수로 받으며, 주어진 키가 맵 안에 아직 없다면 주어진 {키,값}쌍을 그대로 저장한다. 
+반대로 키가 이미 있으면 세번째 인수 함수를 현재 값과 주어진 값에 적용한 다음 그 결과로 현재 값을 덮어쓴다.
+-> 매개변수 count와 incr은 크게 하는 일 없이 공간을 차지하며, 단순한 인수의 합만 반환할 뿐이다.
+
+### 메서드 참조
+```java
+map.merge(key, 1, Integer::sum);
+```
+자바8이 되면서 모든 기본 타입의 박싱 타입에는 람다와 같은 기능인 정적 메서드 sum을 제공하기 시작했다.
+-> 람다로 구현했을 때 너무 길거나 복잡하다면 메서드 참조가 좋은 대안이 되어준다.
+
+## 람다 vs 메서드 참조 - 람다 win
+다음 코드가 GoshThisClassNameIsHumongous 클래스 안에 있다고 가정했을 시
+
+### 메서드 참조
+```java
+service.excecute(GoshThisClassNameIsHumongous::action);
+```
+
+### 람다
+```java
+service.execute(() -> action());
+```
+## 메서드 참조의 유형
+### 1. 정적메서드를 가리키는 메서드 참조
+```java
+//메서드 참조
+Integer::parseInt
+//람다
+str -> Integer.parseInt(str)
+```
+
+### 2. 인스턴스 메서드를 참조하는 유형1 - 한정적 인스턴스 메서드 참조
+함수 객체가 받는 인수와 참조되는 메서드가 받는 인수가 똑같다.
+```java
+//메서드 참조
+Instant.now()::isAfter
+//람다
+Instant then = Instant.now();
+t -> then.isAfter(t);
+```
+
+### 3. 인스턴스 메서드를 참조하는 유형2 - 비한정적 인스턴스 메서드 참조
+함수 객체를 적용하는 시점에 수신 객체를 알려준다
+```java
+//메서드 참조
+String::toLowerCase
+//람다
+str -> str.toLowerCase()
+```
+
+### 4. 클래스 생성자를 가리키는 메서드 참조
+팩토리 캑체를 사용한다
+```java
+//메서드 참조
+TreeMap<K,V>::new
+//람다
+() -> new TreeMap<K,V>()
+```
+
+### 5. 배열 생성자를 가리키는 메서드 참조
+```java
+//메서드 참조
+int[]::new
+//람다
+len -> new int[len]
+```
+
+## 람다로 불가능하나 메서드 참조로 가능한 유일한 예
+바로 제네릭 함수 타입 구현이다.
+
+```java
+interface G1 {
+   <E extends Exception> Object m() throws E;
+}
+
+interface G2 {
+   <F extends Exception> String m() throws Exception;
+}
+
+interface G extends G1, G2 {}
+```
+이때 함수형 인터페이스 G를 함수 타입으로 표현하면 다음과 같다. (?)
+```java
+<F extends Exception> () -> String throws F
+```
+
+## 요약
+1. 메서드 참조 쪽이 짧고 명확하다면 메서드 참조를 쓰고, 그렇지 않을 때만 람다를 사용하라.
