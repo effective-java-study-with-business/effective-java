@@ -1,20 +1,32 @@
 # 아이템38. 확장할 수 있는 열거 타입이 필요하면 인터페이스를 사용하라
 
-열거 타입은 거의 모든 상황에서 타입 안전 열거 패턴(typesafe enum pattern)보다 우수하다.
+## ****타입 안전 열거 패턴(typesafe enum pattern)****
 
-그러나 한 가지 예외가 있다.
+이펙티브자바 초판에서 소개되었던 타입 안전 열거 패턴을 소개를 했었다.
 
-타입 안전 열거 패턴은 확장할 수 있으나 열거 타입은 그럴 수 없다는 점이다.
+```java
+public class TypesafeOperation {
+    private final String type;
+    private TypesafeOperation(String type) {
+        this.type = type;
+    }
 
-대부분 상황에서 열거 타입을 확장하는 게 좋지 않은 이유
+    public String toString() {
+        return type;
+    }
+    
+    public static final TypesafeOperation PLUS = new TypesafeOperation("+");
+    public static final TypesafeOperation MINUS = new TypesafeOperation("-");
+    public static final TypesafeOperation TIMES = new TypesafeOperation("*");
+    public static final TypesafeOperation DIVIDE = new TypesafeOperation("/");
+}
+```
 
-- 확장한 타입의 원소는 기반 타입의 원소로 취급하지만 그 반대는 성립하지 않는다면 이상하지 않은가!
-- 기반 타입과 확장된 타입들의 원소 모두를 순회할 방법도 마땅치 않다.
-- 마지막으로, 확장성을 높이려면 고려할 요소가 늘어나 설계와 구현이 더 복잡해진다.
-
-그럼에도 확장할 수 있는 열거 타입이 어울리는 쓰임이 최소한 하나는 있으므로 알아보자.
-
-기본 아이디어는 열거 타입이 임의의 인터페이스를 구현할 수 있다는 사실을 이용하는 것이다.
+- 클래스를 이용하고, 생성자를 private로 만들어 최초 정의된 객체만 참조할 수 있게 했다. 열거 타입과 비슷하게 사용할 수 있지만, **사실 단 하나를 제외하곤 모든 부분에서 열거 타입이 우수하다.**
+- 바로 타입 안전 열거 패턴은 확장이 가능하지만 열거 타입은 그럴수 없다는 점이다.
+- 물론, 대부분 상황에서 열거 타입을 확장하려는 시도가 좋은생각은 아니다. 확장 타입 원소는 기반 타입 원소로 취급되지만 반대의 경우는 성립하지도 않고 기반타입 + 확장타입 원소를 모두 순회할 방법도 딱히 없다.
+- 그리고 확장성을 높히려고 할 때 고려할 설계와 구현이 너무 복잡해진다.
+- 하지만, 확장할 수 있는 열거 타입이 어울리는 경우가 있긴 하다. 위에서도 작성한 연산 코드(operation code)인데,  연산 코드의 각 원소는 특정 기계가 수행하는 연산을 의미한다. (ex: 계산기의 연산 기능) 그럼 이 경우 우리는 어떻게 확장을 해야 할까?
 
 ### 인터페이스를 사용한 예시
 
