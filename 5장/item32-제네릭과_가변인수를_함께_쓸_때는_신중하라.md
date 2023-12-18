@@ -49,7 +49,7 @@ public static void dangerous(List<String>... stringLists){
 
 단, `@SafeVarargs`은 메소드 작성자가 그 메소드 타입이 안젆마을 보장하는 장치이므로, 안전한 경우에만 사용하는 것이 좋다.
 
-# 안전한 건 어떤 것이고, 위험한 건 어떤 것일까
+## 안전한 건 어떤 것이고, 위험한 건 어떤 것일까
 
 ### 안전
 
@@ -78,6 +78,47 @@ public static void main(String[] args) {
   String[] attributes = pickTwo("좋은", "빠른", "저렴한");
 }
 ```
+
+## 제네릭 varargs 매개변수를 안전하게 사용하는 메소드
+
+```java
+@SafeVarargs
+static <T> List<T> flatten(List<? extends T>... lists) {
+  List<T> result = new ArrayList<>();
+  for(List<? extends T> list : lists) {
+    result.addAll(list);
+  }
+  return result;
+}
+```
+
+해당 메소드는 안전하다. `varargs` 배열을 직접 노출시키지 않고, T타입의 제네릭 타입을 사용하였기 때문에 `ClassCastException` 또한 발생할 일이 없다.
+
+안전한 varargs 메소드에는 @SafeVarargs를 달아서 컴파일러 경고를 제거하자.
+
+## 제네릭 varargs 매개변수를 List로 대체하라.
+
+```java
+static <T> List<T> flatten(List<List<? extends T>> lists) {
+  List<T> result = new ArrayList<>();
+  for (List<? extends T> list : lists) {
+    result.addAll(list);
+  }
+  return result;
+}
+```
+
+이 방식의 장점은 이 메서드의 타입 안전성을 검증할 수 있다는 점이다.
+
+@SafeVarargs를 달지 않아도 되며 실수로 안전하다고 판단할 걱정도 없다.
+
+단점은 클라이언트 코드가 살짝 지저분해지고, 속도가 약간 느려질 수 있다는 점이다.
+
+# 정리
+
+- `varargs` 매개변수는 단순히 파라미터를 받아와 **메서드의 생산자(T 타입의 객체를 제공하는 용도)로만 사용하자**.
+- varargs는 **read-only**라고 생각하고, **아무런 데이터를 저장하지 말자**
+- varargs 배열을 외부에 **리턴하거나 노출하지 말자**. **웬만하면 다시 컬렉션(List)에 담아 리턴하는 안전한 방식을 취하자.**
 
 # + Heap 오염
 
