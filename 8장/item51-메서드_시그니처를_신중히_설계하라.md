@@ -23,7 +23,7 @@
 
 ## 2. 편의 메서드를 너무 많이 만들지 않기
 - 클래스나 인터페이스는 자신의 각 기능을 완벽히 수행하는 메서드로 제공
-- 자주 쓰일 경우에만 별도의 약칭 메서드로 두기
+- 자주 쓰일 경우에만 별도의 약칭 메서드로 두기 ex) min, max, isEmpty
 - **확신이 서지 않으면 만들지 않기**
 - 사용자의 눈높이메 맞춰 기본 기능을 조합하여 만들 수 있도록 제공하는 것도 좋은 방법(직교성)
   - 이후 매개변수 목록을 짧게 유지하는 것과 밀접한 연관
@@ -93,15 +93,68 @@
     }    
     ```
 2. 매개변수 여러 개를 묶어주는 도우미 클래스를 만듬
+```java
+import lombok.Builder;
+
+public class CardGame {
+
+    public enum Shape {
+        DIA, HEART, CLOVER, SPADE
+    }
+
+    // helper class
+    public static class CardAttribute {
+        private int number;
+        private Shape shape;
+        private String color;
+
+        @Builder
+        public CardAttribute(int number, Shape shape, String color) {
+            this.number = number;
+            this.shape = shape;
+            this.color = color;
+        }
+    }
+
+    // Parameter with helper class is easier to use
+    public void pickup(String gamer, CardAttribute card) {
+        System.out.printf("%s picked up %s %s %d card!", gamer, card.shape, card.color, card.number);
+    }
+
+    public void pickup(String gamer, int number, Shape shape, String color) {
+        System.out.printf("%s picked up %s %s %d card!", gamer, shape, color, number);
+    }
+
+}
+```
+```java
+public class CardGameMain {
+    public static void main(String[] args) {
+        CardGame game = new CardGame();
+
+        // Order should be checked...
+        game.pickup("Minah", 7, CardGame.Shape.DIA, "Red");
+
+        CardGame.CardAttribute card = CardGame.CardAttribute.builder()
+                .shape(CardGame.Shape.DIA)
+                .color("Red")
+                .number(7)
+                .build();
+
+        game.pickup("Minah", card);
+    }
+}
+```
 3. 객체 생성에 사용한 빌더 패턴을 메서드 호출에 응용
+    - 1번과 2번을 혼합한 것(위의 코드의 builder 패턴 참조)
+    - 매개변수가 많지만, 일부만 있어도 괜찮은 경우에 사용
+    - 모든 매개변수를 하나로 추상화 한 객체 정의
+    - 클라이언트에서 세터를 호출하여 필요한 값 설정 및 유효성 검사
 
 ## 4. 매개변수의 타입으로는 인터페이스 사용
 - 매개변수로 적합한 클래스가 있는 경우 클라이언트에게 선택권을 줄 수 있음
 - 특정 클래스에 의존하여 구현해야하는 경우가 아니라면, 구현체를 파라미터로 제한하는 것은 클라이언트가 복사 비용을 치뤄 사용해야 함
-- ex) ArrayList 대신 List를 넣어 구현
-```java
-
-```
+- ex) 매개변수에 ArrayList 대신 List를 받아 로직 구현
 
 ## 5. boolean 보다는 원소 2개짜리 열거 타입을 사용하기
 - Enum의 경우는 별도의 이름과 값이 명명되어 있으므로 읽기 쉬워짐
