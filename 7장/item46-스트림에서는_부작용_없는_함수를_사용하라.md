@@ -1,11 +1,12 @@
 #  Item46 스트림에서는 부작용 없는 함수를 사용하라
 
+---
 ## 1. 스트림의 패러다임
 - 함수형 프로그래밍에 기초한 패러다임.
 - 계산을 일련의 변환으로 재구성하는 단계는 순수 함수 이어야 합니다.
 - 순수함수란 입력만이 결과에 영향을 주는 함수
 - 다른 가변 상태를 참조하지 않고, 함수 스스로도 다른 상태를 변경하지 않아야합니다.
-
+---
 ## 2. 잘못 사용한 경우
 - 내부에서 외부 상태를 수정하는 경우 순수함수가 아닙니다.
 - 다음은 파일의 문자를 읽어 문자가 몇번 등장하는지 세어 맵에 담는 예제 입니다.
@@ -38,8 +39,13 @@ try(Stream<String> words = new Scanner(file).tokens()) {
         .forEach((key, value) -> logger.log(new LogEvent(key, value)));
 }
 ```
-
+---
 ## 3. 수집기. Collectors의 사용법
+
+스트림 함수인 collect의 동작 방식은 인자로 받은 Collector로 reducing 연산을 수행해 결과를 반환합니다.
+Collectors는 Collector의 구현체는 아니고 내부 클래스로 미리 정의된 CollectorImpl을 가지고 있습니다.
+정적 메서드가 호출 될때마다 CollectorImpl을 만들어 반환합니다.
+많이 사용하는 toList, toMap 등을 모아둔 일종의 유틸 클래스 입니다.
 
 ### 원소 모으기
 #### toList()
@@ -100,8 +106,48 @@ StringBilder를 이용해 문자열을 연결해줍니다. 연결 문자열 지�
 ```java
 String titles = albums.stream().map(Album::getTitle).collect(joining(","));
 ```
-
+---
 ## 4. 정리
 - 스트림 사용시 관련 객체와 모든 함수 객체가 부작용이 없어야 합니다.
 - forEach는 계산 자체가 아닌 결과 보고시에만 사용하도록 합니다.
 - Collectors 수집기를 잘 활용합시다.
+
+---
+### + 추가 질문사항
+
+1. flatMap 소개
+flatMapping 은 다중 레벨로 나뉜 스트림을 연산하여 하나의 스트림으로 만들어 결과를 도출합니다.
+groupingBy 또는 partitionedBy 와 함께 사용시 유용합니다.
+다음의 예시를 보면 한번 그루핑된 스트림을 처리하는데 쓸수 있고, downstream 인자로 만들어질 타입도 지정할 수 있습니다.
+```java
+Map<String, Set<LineItem>> itemsByCustomerName = orders.stream().collect(
+          groupingBy(Order::getCustomerName,
+                     flatMapping(order -> order.getLineItems().stream(),
+                                 toSet())));
+```
+
+2. reduce 소개
+Stream.reduce(accumulator) 함수는 스트림 요소들을 연산해 하나의 요소로 도출합니다.
+연산을 수행하는 함수 인자로 BinaryOperator 객체를 받습니다.
+BinaryOperator는 T 타입 인자 두개를 받고, T타입 객체를 리턴하는 함수형 인터페이스입니다.
+
+```java
+Stream<Integer> intStream = Stream.of(1, 2, 3, 4, 5);
+Optional<Integer> sum = intStream.reduce((x, y) -> x + y);
+```
+
+Collectors의 정적 요약 연산 대부분 Collectors.reducing 메서드를 이용해 값을 도출합니다.
+reducing 메서드를 사용하면 커스텀해서 기능을 만들어 사용할 수 있습니다.
+예를 들어 다음과 같이 앨범 누적 판매수를 도출할 수 있습니다.
+```java
+Long sales = albums.stream()
+        .collect(reducing(
+                0L, //연산 초기값
+                Album::getSales, //각 요소에 적용 변환함수
+                Long::sum)//요약할 BinaryOperator 누적함수
+        );
+```
+실제로는 위의 예제처럼 장황하게 쓰지않고, stream의 reduce 메서드를 쓰면 됩니다.
+
+
+
