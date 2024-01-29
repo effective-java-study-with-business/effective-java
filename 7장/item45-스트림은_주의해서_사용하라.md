@@ -4,6 +4,12 @@
   1. **stream** : 데이터 원소의 유/무한 시퀀스
   2. **stream pipeline** : 원소들로 수행하는 연산 단계
 
+### Features of Stream API
+1. Inner iteration
+
+### Advantages of Stream API
+1. 
+
 ### Stream Pipeline
 - 흐름<sup>[1]</sup><sup>[2]</sup><sup>[3]</sup>
   1. **소스 스트림** : 배열, 컬렉션, 파일, 다른 스트림 등으로 스트림을 구성
@@ -23,6 +29,9 @@
   - 여러 파이프라인을 연결하여 표현식 하나로 만듬
   - 순차적 수행
   - parallel 메서드를 이용하여 병렬로 호출 가능하나, 효과를 볼 수 있는 상황은 적음
+
+### Without Terminal Operation, Stream & Elements Will Be..?
+// TBD
 
 ## 2. Usage of Stream
 - 스트림은 잘 사용하면 깔끔해지지만, 과용 시에는 이해하거나 유지보수가 힘듬
