@@ -56,7 +56,7 @@ java.io.Serializable을 implements하여 자바 내에서 바이트 스트림으
 - 데이터를 "표현"하기 위해 사용 : 텍스트 기반 표현에는 JSON이 효율적
 
 ### Protobuf? <sup>[3]</sup>
-```json
+```
 message Person {
     required string name = 1;
     required int32 id = 2;
