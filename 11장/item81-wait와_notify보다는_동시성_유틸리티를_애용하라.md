@@ -56,7 +56,8 @@ public static String intern(String s) {
 - 하나 이상의 스레드가 또 다른 하나 이상의 스레드 작업이 끝날 때까지 기다리게 한다.
 - 생성자에서 int 값을 받고 래치의 countDown 메서드를 몇번 호출해야 대기 중인 스레드를 깨우는지 결정.
 
-어떤 동작을 동시에 시작해 모두 완료할때 까지 시간을 재는 로직
+어떤 동작을 동시에 시작해 모두 완료할때 까지 시간을 재는 로직.
+다음 예제는 메인 스레드가 3개의 스레드를 생성하고, 3개의 스레드가 작업을 종료할 때까지 걸리는 시간은 재는 예제이다.
 ```java
 public static void main(String[] args) {
 
@@ -78,7 +79,7 @@ public static long time(Executor executor, int concurrency, Runnable action) thr
 
     for (int i = 0; i < concurrency; i++) {
         executor.execute(() -> {
-            // 타이머에게 준비가 됐음을 알린다.
+            // ready 래치 카운트 다운. 카운트가 0이 되면 startNanos 기록.
             ready.countDown();
             try {
                 // 모든 작업자 스레드가 준비될 때까지 기다린다.
@@ -108,16 +109,23 @@ hello
 Time : 364956
 ```
 
-3개의 카운트다운 래치 사용. 
+실행 순서는 다음과 같다.
 
-**ready 래치** 는 작업자 스레드들이 준비 완료 되었음을 타이머 스레드에 통지할 때 사용한다.
+1) 3개의 카운트다운 래치가 사용되는데,
+카운트 3을 가진 read 래치, 카운트 1을 가진 start 래치, 카운트 3을 가진 down 래치가 준비된다.
 
-통지를 끝낸 작업자 스레드들은 두번째 **start 래치**가 열리기를 기다린다.
 
-마지막 작업자 스레드가 ready.countDown 을 호출하면 start.countDown을 호출하여 기다리던 작업자 스레드를 깨운다
+2) 실제 print 작업을 run 시키기 전 3개의 스레드에서 ready 래치로 카운트 다운을 하면,
+메인 스레드에서는 세개의 스레드에서 작업을 실행하기 전까지 await 으로 작업 중지를 시켜놓는다.
 
-마지막 작업자 스레드가 동작을 마치고 done.countDown 을 호출해 **done 래치** 가 열리고 타이머 스레드가 종료시각을 기록한다.
 
+4) ready 래치 카운트가 0 이되면 타이머 시작 시간을 기록하고,
+메인 스레드에서 시작 시간을 기록하기 전까지 start.await 로 대기시켜 두엇던 작업 스레드를 
+start.countDown() 으로 모두 실행시킨다.
+
+
+5) 마지막 작업을 모두 수행한 후 걸리는 시간을 측정하기 위해 done 래치가 done.countDown() 을 각 작업 스레드 마지막에 수행하면, 
+작업을 기다리고 있던 메인 스레드는 done 카운트가 0이 되면 마지막 시간을 측정해 모든 스레드가 종료된 시간을 계산해 리턴한다.
 
 ## 3. wait 과 notify
 - Object 클래스에 스레드와 관련하여 있는 wait()와 notify(), notifyAll() 메서드.
