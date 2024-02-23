@@ -1,7 +1,10 @@
 # [Item 58] 전통적인 for문보다는 for-each문을 사용하라
 
 ## 1. for VS for-each
+### For
 - for문의 경우 인덱스를 명시하여 배열, collection을 순회하므로 관리할 요소 종류 증가
+- index를 이용하여 접근하기 때문에, collection의 ArrayList나 array 순회 시에 빠름<sup>[1]</sup>
+  - LinkedList를 for문으로 돌리면 느리다!<sup>[2][3]</sup>
 ```java
 import java.util.*;
 
@@ -17,10 +20,15 @@ public class KeywordUtil {
     }
 }
 ```
+### For-Each
 - 향상된 for문 사용 : for-each문은 인덱스 관리 없이 원소를 순회하므로 가독성이 높음
+- collection 내부의 Iterator을 사용하여 순회함 : LinkedList 성능이 괜찮음<sup>[2][3]</sup>
+- Random Access가 존재하지 않는 Collection에서 강함!
+- 인덱스는 무조건 1씩 증가하여 순회
 ```java
 import java.util.*;
 
+@Slf4j
 public class KeywordUtil {
     public void processKeywords(List<String> keywords) {
         for (String keyword : keywords) {
@@ -62,6 +70,11 @@ public class KeywordUtil {
     }
 }
 ```
+
+### Ref) Random Access?<sup>[4]</sup>
+- Collection에는 특정 index에 Random으로 Access가 불가함
+- 하지만, 일반 array의 경우에는 Random Access가 가능
+- 
 
 ## 2. Conditions of Neglect Usage for-each
 1. destructive filtering : remove 메소드 호출 시
@@ -122,3 +135,7 @@ public interface Iterable<T> {
 - index가 명시적으로 필요하거나 2번에 부합한 내용이 아니라면 **모든 for 구문을 for-each로 변경하자**
 
 ## References
+[1] https://braindisk.tistory.com/156
+[2] https://stackoverflow.com/questions/11555418/why-is-the-enhanced-for-loop-more-efficient-than-the-normal-for-loop
+[3] https://wnwngus.tistory.com/57
+[4] https://inside.caratlane.com/arrays-understanding-the-random-access-3d07983b20ca
