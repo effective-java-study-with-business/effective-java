@@ -23,7 +23,7 @@ public class KeywordUtil {
 ### For-Each
 - 향상된 for문 사용 : for-each문은 인덱스 관리 없이 원소를 순회하므로 가독성이 높음
 - collection 내부의 Iterator을 사용하여 순회함 : LinkedList 성능이 괜찮음<sup>[2][3]</sup>
-- Random Access가 존재하지 않는 Collection에서 강함!
+- Random Access<sup>Ref)</sup>가 존재하지 않는 Collection에서 강함!
 - 인덱스는 무조건 1씩 증가하여 순회
 ```java
 import java.util.*;
@@ -71,10 +71,18 @@ public class KeywordUtil {
 }
 ```
 
-### Ref) Random Access?<sup>[4]</sup>
-- Collection에는 특정 index에 Random으로 Access가 불가함
+### Ref) Random(Direct) Access?<sup>[4]</sup>
+- 배열(array)의 특정 element에 이동, 삽입 등의 작업 시, 그 위치로 바로 가는 방식
+  - 배열의 0번째 element(혹은 head)부터 타고타고 가는 것이 아님!
+- 배열은 연속적인 공간에 elements가 위치해있고, 컴파일러는 해당 배열의 pointer를 찾음
+  - 이것을 base address라고 칭할 수 있음
+- 각 자료형은 파일의 크기가 정해져있고, 어떤 작업(접근)을 할 인덱스가 주어지면 단순한 formula로도 특정 element에 바로 접근 가능
+  - 1차원 배열의 경우는 아래와 같다고 보면 됨
+  ```
+  Real Memory Location of Index = Base Address + (Size of Element * Index)
+  ```
+- Collection에는 특정 index에 Random(Direct)으로 Access가 불가함
 - 하지만, 일반 array의 경우에는 Random Access가 가능
-- 
 
 ## 2. Conditions of Neglect Usage for-each
 1. destructive filtering : remove 메소드 호출 시
@@ -130,6 +138,9 @@ public interface Iterable<T> {
 ```
 - 특정 클래스에 순회 동작이 예상된다면 Collection까지는 아니어도 Iterable을 구현하는 방향으로 구상하기
   - 위의 interface처럼 forEach를 사용할 수 있으므로 압도적 감사!
+
+### Concurrency Problems between for statement and forEach()
+- 
 
 ## 3. Conclusion
 - index가 명시적으로 필요하거나 2번에 부합한 내용이 아니라면 **모든 for 구문을 for-each로 변경하자**
