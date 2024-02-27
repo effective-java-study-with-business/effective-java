@@ -107,8 +107,9 @@ public class KeywordUtil {
 3. parallel iteration : 병렬 순회 시, 각 반복자와 인덱스 변수를 사용하여 명시적 제어 필요
 
 ## 3. Iterable Interface?
-- for-each문은 iterable 인터페이스를 구현한 객체 : 무엇이든 순회 가능
+- for-each문은 배열 말고도 iterable 인터페이스를 구현한 객체라면 무엇이든 순회 가능
 - Iterable 인터페이스는 메서드가 단 한개 뿐!
+- 결국 Iterable의 .forEach()도 for-each문을 내부적으로 사용하고 있음
 ```java
 package java.lang;
 
@@ -139,8 +140,20 @@ public interface Iterable<T> {
 - 특정 클래스에 순회 동작이 예상된다면 Collection까지는 아니어도 Iterable을 구현하는 방향으로 구상하기
   - 위의 interface처럼 forEach를 사용할 수 있으므로 압도적 감사!
 
-### Concurrency Problems between for statement and forEach()
-- 
+### Concurrency Problems of for-each statement & forEach()<sup>[1]</sup>
+- Collection의 for-each, forEach() 수행 시, 컬렉션의 요소를 추가/삭제하는 경우 동시성 관련하여 문제가 생길 수 있음
+- AbstractList에는 modCount라는 변수가 있음<sup>[5]</sup>
+  - iterator 사용 시 동기화가 보장되도록 수정 횟수를 체크하는 변수임
+  - 동기화를 위해 expectedModCount 값과 modCount 값을 비교함
+  - 어떤 Collection이 forEach 수행 시, modCount != expectedModCount 이면 ConcurrentModificationException 에러 발생!
+  ```text
+  modCount와 expectedModCount의 작동 방식 in AbstractList(private class Itr 참고)
+  1. iterator 새로 생성 시, expectedModCount = modCount 초기화
+  2. add, remove, set 연산 시마다 expectedModCount = modCount 초기화
+  3. next(), previous() 등 커서를 옮기거나, add, remove, set 연산 시작 전에 expectedModCount == modCount 체크
+        -> 같지 않다면 바로 ConcurrentModificationException 에러를 발생 시킴
+  ```
+- 따라서, 2번과 같이 요소를 삽입, 수정, 삭제 등의 연산을 하는 경우에는 for-each, forEach() 둘다 안된다!
 
 ## 3. Conclusion
 - index가 명시적으로 필요하거나 2번에 부합한 내용이 아니라면 **모든 for 구문을 for-each로 변경하자**
@@ -150,3 +163,4 @@ public interface Iterable<T> {
 [2] https://stackoverflow.com/questions/11555418/why-is-the-enhanced-for-loop-more-efficient-than-the-normal-for-loop
 [3] https://wnwngus.tistory.com/57
 [4] https://inside.caratlane.com/arrays-understanding-the-random-access-3d07983b20ca
+[5] https://velog.io/@kimsy8979/java-ArrayList-%EB%82%B4%EB%B6%80-%EB%8F%99%EC%9E%91-%EB%B6%84%EC%84%9D
