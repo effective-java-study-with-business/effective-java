@@ -5,10 +5,16 @@
   2. **stream pipeline** : 원소들로 수행하는 연산 단계
 
 ### Features of Stream API
-1. Inner iteration
+1. Inner iteration<sup>[4]</sup>
+   - for문, while문 등으로 직접 Collection의 element를 가져오는 것이 아닌 내부에서 반복시키는 패턴
+   - 개발자는 element당 처리 할 코드만 제공
+   - 효율적으로 요소 반복 가능 : 반복 순서 변경 or 병렬 처리
+2. 람다식으로 element를 처리함
+3. method chaining<sup>[5]</sup>
 
 ### Advantages of Stream API
-1. 
+1. 코드의 간결성
+2. 
 
 ### Stream Pipeline
 - 흐름<sup>[1]</sup><sup>[2]</sup><sup>[3]</sup>
@@ -72,3 +78,5 @@
 [1] https://zangzangs.tistory.com/171
 [2] https://colevelup.tistory.com/12
 [3] https://www.geeksforgeeks.org/java-8-stream-tutorial/
+[4] https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=qkrghdud0&logNo=220702640712
+[5] https://www.geeksforgeeks.org/stream-in-java/
