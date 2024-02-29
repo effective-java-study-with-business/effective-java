@@ -9,12 +9,13 @@
    - for문, while문 등으로 직접 Collection의 element를 가져오는 것이 아닌 내부에서 반복시키는 패턴
    - 개발자는 element당 처리 할 코드만 제공
    - 효율적으로 요소 반복 가능 : 반복 순서 변경 or 병렬 처리
-2. 람다식으로 element를 처리함
-3. method chaining<sup>[5]</sup>
+2. 람다식으로 element 처리
+3. Method chaining<sup>[5]</sup>
 
 ### Advantages of Stream API
 1. 코드의 간결성
-2. 
+2. 병렬 처리의 용이성
+3. 
 
 ### Stream Pipeline
 - 흐름<sup>[1]</sup><sup>[2]</sup><sup>[3]</sup>
@@ -37,7 +38,7 @@
   - parallel 메서드를 이용하여 병렬로 호출 가능하나, 효과를 볼 수 있는 상황은 적음
 
 ### Without Terminal Operation, Stream & Elements Will Be..?
-// TBD
+- 지연 
 
 ## 2. Usage of Stream
 - 스트림은 잘 사용하면 깔끔해지지만, 과용 시에는 이해하거나 유지보수가 힘듬
