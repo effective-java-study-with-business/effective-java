@@ -6,16 +6,17 @@
 
 ### Features of Stream API
 1. Inner iteration<sup>[4]</sup>
-   - for문, while문 등으로 직접 Collection의 element를 가져오는 것이 아닌 내부에서 반복시키는 패턴
+   - for문, while문 등으로 직접 Collection의 element를 가져오는 것(외부 반복자)이 아닌 내부에서 반복시키는 패턴
    - 개발자는 element당 처리 할 코드만 제공
    - 효율적으로 요소 반복 가능 : 반복 순서 변경 or 병렬 처리
 2. 람다식으로 element 처리
 3. Method chaining<sup>[5]</sup>
 
-### Advantages of Stream API
+### Advantages of Stream API<sup>[5]</sup>
 1. 코드의 간결성
+   - 숙련자는 글을 읽듯이 로직을 순차적으로 읽으면 됨
 2. 병렬 처리의 용이성
-3. 
+3. 요소의 개수가 정해지지 않아도 Collection 내부의 무한으로 데이터를 다룰 수 있음
 
 ### Stream Pipeline
 - 흐름<sup>[1]</sup><sup>[2]</sup><sup>[3]</sup>
@@ -28,7 +29,7 @@
      - limit(중간 연산), findFirst, findAny, anyMatch, allMatch, noneMatch
      
 - 지연 평가
-  - 스트림은 종단 연산이 호출될 때 평가가 이루어짐
+  - 스트림은 종단 연산이 호출될 때 평가(중간 연산)가 이루어짐
   - 종단 연산에 사용되지 않은 원소는 계산 X
   - 무한 스트림을 다룰 수 있도록 함 : 종단 연산이 없는 스트림 파이프라인은 아무 일도 하지 않는 것
 
@@ -38,7 +39,13 @@
   - parallel 메서드를 이용하여 병렬로 호출 가능하나, 효과를 볼 수 있는 상황은 적음
 
 ### Without Terminal Operation, Stream & Elements Will Be..?
-- 지연 
+- 이론 상, Stream은 **종단 연산과 마주했을 경우에 그 때부터 중간 연산을 수행**함 : 지연 평가
+  - 안타깝게도 이와 관련된 문서가 모두 effective java 게시글이라 Chat GPT에 물어봄
+  ![img.png](item45/img.png)
+- 실제로 보고 싶어서 여러 방식을 시도했으나 종단 연산이 없으면 데이터 관측 불가능
+  - IntelliJ의 스트림 디버깅(하단 Debug console 맨 우측에 Trace Current Stream Chain)을 진행하려 했으나, 종단 연산이 없으면 호출되지 않음
+    - 종단 연산이 있는 스트림 디버깅시에 굉장히 유용함<sup>[6]</sup>
+  - 일반 디버깅 시에는 Stream 객체 내부의 element에 대한 정보가 뜨지 않아서 직접 눈으로 확인은 불가능
 
 ## 2. Usage of Stream
 - 스트림은 잘 사용하면 깔끔해지지만, 과용 시에는 이해하거나 유지보수가 힘듬
@@ -48,7 +55,61 @@
 - 기존 코드는 스트림을 사용하도록 리팩터링하되, 스트림을 사용한 새 코드가 더 나아보일 때 반영
 - 자바는 스트림에 기본 원소인 char용 스트림을 지원하지 않으므로, **char 처리 시에는 스트림 자제**
 ```java
+import lombok.Builder;
+import lombok.Getter;
 
+import java.util.List;
+
+@Getter
+public class Applicant {
+    private long id;
+    private String name;
+    private String department;
+    private List<Career> careers;
+
+    @Builder
+    public Applicant(long id, String name, String department, List<Career> careers) {
+        this.id = id;
+        this.name = name;
+        this.department = department;
+        this.careers = careers;
+    }
+}
+```
+```java
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+public class BlindInterviewee {
+
+    private long id;
+    private String department;
+
+    @Builder
+    public BlindInterviewee(long id, String department) {
+        this.id = id;
+        this.department = department;
+    }
+}
+```
+```java
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class ApplicantServiceImpl {
+    public List<BlindInterviewee> pickIntervieweeFromApplicants(List<Applicant> applicantList) {
+        return applicantList.stream()
+                .filter(applicant -> !applicant.getCareers().isEmpty())
+                .map(passed -> BlindInterviewee.builder()
+                        .id(passed.getId())
+                        .department(passed.getDepartment())
+                        .build())
+                .sorted(Comparator.comparing(BlindInterviewee::getDepartment))
+                .collect(Collectors.toList());
+    }
+}
 ```
 
 ### 스트림과 맞지 않는 예시
@@ -59,9 +120,6 @@
 4. 데이터가 스트림 파이프라인의 여러 단계 통과 시, 각 단계의 값들에 동시에 접근해야 하는 경우
    - 스트림은 한번 매핑하고 나면 원래 값들은 잃어버리는 구조
    - 이런 경우에 스트림을 반드시 사용해야 한다면, **매핑을 거꾸로 수행**하는 방법으로 해결
-```java
-
-```
 
 ### 스트림과 찰떡인 예시
 1. 원소들의 시퀀스를 일관되게 변환 ex) map, flatMap
@@ -72,7 +130,17 @@
 ## 3. Flattening for flatMap
 - 스트림의 원소 각각을 하나의 스트림으로 매핑하고, 그 스트림을 하나의 스트림으로 합침
 ```java
+import java.util.List;
 
+public class ApplicantServiceImpl {
+    public double getAverageWorkingDays(List<Applicant> applicantList) {
+        return applicantList.stream()
+                .flatMapToInt(applicant -> applicant.getCareers().stream()
+                        .mapToInt(Career::getWorkingDays))
+                .average()
+                .getAsDouble();
+    }
+}
 ```
 
 ## References
@@ -81,3 +149,4 @@
 [3] https://www.geeksforgeeks.org/java-8-stream-tutorial/
 [4] https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=qkrghdud0&logNo=220702640712
 [5] https://www.geeksforgeeks.org/stream-in-java/
+[6] https://androphil.tistory.com/760
